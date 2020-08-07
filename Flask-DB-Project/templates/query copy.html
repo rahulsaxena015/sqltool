@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="static/css/table-fixed.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <a class="navbar-brand" href="#">Welcome {{ display_name }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="nav navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href={{ url_for('logout') }}>Logout <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+</nav>
+<br>
+<div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color:#cecece">
+    <form action='/query' method='POST' name="myForm">
+        <select class="form-control" id="cluster" name="cluster" searchable="Search here..">
+            <option value="" selected>Select Cluster</option>
+            <option value="qe">QE</option>
+            <option value="na2">NA2 </option>
+            <option value="na3">NA3</option>
+            <option value="na4">NA4</option>
+            <option value="na5">NA5</option>
+        </select>
+        <br>
+        <br>
+        <textarea class="form-control" name="sqlquery" id="sqlquery" placeholder="Enter Your SQL Query Here!!!"
+            aria-label="Enter Your SQL Query Here" rows="3"></textarea>
+        <br>
+        <button class="btn btn-success btn-ladda" data-style="expand-left" type="button" id="btnSubmit">Execute</button>
+        <input type="reset" value="Reset" class="btn btn-primary" onClick="window.location.reload()">
+    </form>
+</div>
+<br>
+<div id="table2" class="table table-stripped"></div>
+
+<!-- Image loader -->
+<div id="loader" style="display:none;position:relative;margin:auto;top:50%;left:50%;padding:2px;">
+    <img src='static/images/loader.gif' height="70" width="70" /></div>
+
+<!-- <div id="progressBar" class="progress progress-bar-striped bg-success progress-bar-animated" role="progressbar"
+    aria-valuenow="57%" aria-valuemin="0" aria-valuemax="57" style="display: none;">
+</div> -->
+<script type="text/javascript">
+
+    function validate() {
+        if (document.myForm.cluster.value == "") {
+            alert("Please select cluster!!!");
+            return false
+        }
+        else if (document.myForm.sqlquery.value == "") {
+            alert("Please type SQL Query!!");
+            document.myForm.sqlquery.focus();
+            return false
+        }
+        return true
+    }
+    $(document).ready(function () {
+        $("#btnSubmit").click(function (event) {
+            if (validate()) {
+                $("#loader").show();
+                // $("#progressBar").show();
+            }
+
+            $("#table2").empty()
+            $.ajax({
+                data: {
+                    cluster: $('#cluster').val(),
+                    sqlquery: $('#sqlquery').val()
+                },
+                type: 'POST',
+                url: "{{url_for('run_query')}}"
+            })
+                .done(function (response) {
+                    console.log(response);
+                    var user = response;
+                    $.makeTable = function (mydata) {
+                        var table = $('<table border=1>');
+                        var tblHeader = "<tr>";
+                        for (var k in mydata[0]) tblHeader += "<th>" + k + "</th>";
+                        tblHeader += "</tr>";
+                        $(tblHeader).appendTo(table);
+                        $.each(mydata, function (index, value) {
+                            var TableRow = "<tr>";
+                            $.each(value, function (key, val) {
+                                TableRow += "<td>" + val + "</td>";
+                            });
+                            TableRow += "</tr>";
+                            $(table).append(TableRow);
+                        });
+                        return ($(table));
+                    };
+                    var mydata = eval(user);
+                    var table = $.makeTable(mydata);
+                    $("#table2").empty()
+                    console.log(table)
+                    $(table).appendTo("#table2");
+                    $("#loader").hide();
+
+                });
+            // event.preventDefault();
+        });
+    });
+
+
+</script>
+
+<!-- {{tables|safe}} -->
+{% endblock %}

@@ -1,0 +1,18 @@
+div.container {
+    width: 100%;
+}
+
+th {
+    font-size: 16px;
+    /* background-color: #009966; */
+}
+
+td {
+    font-size: 14px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    /* background-color: #ddFFdd; */
+}
+
+#example_wrapper {
+    background-color: rgb(217, 234, 237);
+}

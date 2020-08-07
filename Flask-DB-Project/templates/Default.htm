@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JSON Data To HTML Table</title>
+    <!-- <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300|Open+Sans+Condensed:300|Open+Sans:300"
+        rel="stylesheet"> -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id="table2" class="margin-bottom"></div>
+    <script type="text/javascript">
+        var jdata = [
+            {
+                "SERVICE_HOST_ID": 4,
+                "NAME": "connectvfmg01",
+                "EXTERNAL_NAME": "connectfmg05.corp.adobe.com",
+                "TYPE": 5,
+                "STATUS": "D",
+                "CONNECTIONS": 0,
+                "LOAD_FACTOR": 0.0,
+                "DATE_EXPIRED": "2012-06-15T10:09:47.337",
+                "CONFIG_UPDATE_REQUIRED": 1,
+                "REQUESTED_CONNECTIONS": 0,
+                "MEMORY_USAGE": 0.0,
+                "CPU_USAGE": 0.0
+
+            },
+            {
+                "SERVICE_HOST_ID": 6,
+                "NAME": "sj1010006193247",
+                "EXTERNAL_NAME": "sj1010006193247.corp.adobe.com",
+                "TYPE": 6,
+                "STATUS": "X",
+                "CONNECTIONS": 0,
+                "LOAD_FACTOR": 0.0,
+                "DATE_EXPIRED": "2016-02-29T09:24:33.323",
+                "CONFIG_UPDATE_REQUIRED": 1,
+                "REQUESTED_CONNECTIONS": 0,
+                "MEMORY_USAGE": 0.0,
+                "CPU_USAGE": 0.0
+
+            }
+        ]
+        $.makeTable = function (mydata) {
+            var table = $('<table border=1>');
+            var tblHeader = "<tr>";
+            for (var k in mydata[0]) tblHeader += "<th>" + k + "</th>";
+            tblHeader += "</tr>";
+            $(tblHeader).appendTo(table);
+            $.each(mydata, function (index, value) {
+                var TableRow = "<tr>";
+                $.each(value, function (key, val) {
+                    TableRow += "<td>" + val + "</td>";
+                });
+                TableRow += "</tr>";
+                $(table).append(TableRow);
+            });
+            return ($(table));
+        };
+        var mydata = eval(jdata);
+        var table = $.makeTable(mydata);
+        $(table).appendTo("#table2");
+    </script>
+</body>
+
+</html>

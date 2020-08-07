@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- <link href="https://datatables.net/download/build/nightly/jquery.dataTables.css" rel="stylesheet" type="text/css" /> -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" />
+<!-- <link rel="stylesheet" type="text/css" href="/static/css/df_style.css"> -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.js"
+    defer></script>
+
+
+{% endblock %}
+
+{% block body %}
+<br>
+
+    <!-- <div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color:#cecece"> -->
+    <div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color: rgb(217, 234, 237)">
+        <form action='/query' method='POST' name="myForm">
+            <select class="form-control" id="cluster" name="cluster" searchable="Search here..">
+                <option value="" selected>Select Cluster</option>
+                {% for cluster in cluster_list %}
+                <option value="{{cluster}}">{{cluster.upper()}}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <br>
+            <textarea class="form-control" name="sqlquery" id="sqlquery" placeholder="Enter Your SQL Query Here!!!"
+                aria-label="Enter Your SQL Query Here" rows="3"></textarea>
+            <br>
+            <button class="btn btn-success btn-ladda" data-style="expand-left" type="button"
+                id="btnSubmit">Execute</button>
+            <input type="reset" value="Reset" class="btn btn-primary" onClick="window.location.reload()">
+        </form>
+        <br>
+        <div id="table2">
+            <table id="example" class="display cell-border" width="100%"></table>
+        </div>
+    </div>
+    
+
+<br>
+
+
+<!-- Image loader -->
+<div id="loader" style="display:none;position:relative;margin:auto;top:50%;left:50%;padding:2px;">
+    <img src='static/images/loader.gif' height="50" width="50" /></div>
+
+<script type="text/javascript">
+    // function myerror() {
+    var myerror = '{{ err }}';
+    //     if (myerror !== "") {
+    //         alert("There was an error processing your query. Please validate again.")
+    //         return false
+    //     }
+    //     return true
+    // }
+
+    $(document).ready(function () {
+        $("#btnSubmit").click(function (event) {
+            if ($.trim($('#cluster').val()) == '') {
+                alert("Please select Cluster");
+                $('#cluster').focus();
+                return false
+            }
+
+            else if ($.trim($('#sqlquery').val()) == '') {
+                alert("Please enter query");
+                $('#sqlquery').focus();
+                return false
+            }
+
+            else {
+                $("#loader").show();
+            }
+
+            if ($.fn.DataTable.isDataTable("#example")) {
+                $('#example').DataTable().clear().destroy();
+                $("#example").empty();
+            }
+
+            // $('#example').DataTable().clear().draw();
+            $.ajax({
+                data: {
+                    cluster: $('#cluster').val(),
+                    sqlquery: $('#sqlquery').val()
+                },
+                type: 'POST',
+                url: "{{url_for('run_query')}}"
+            })
+                .done(function (response) {
+                    console.log(response)
+                    var cols = [];
+
+                    var exampleRecord = response[0];
+
+                    //get keys in object. This will only work if your statement remains true that all objects have identical keys
+                    var keys = Object.keys(exampleRecord);
+
+                    //for each key, add a column definition
+                    keys.forEach(function (k) {
+                        cols.push({
+                            title: k,
+                            data: k
+                        });
+                    });
+
+                    //initialize DataTables
+                    var table = $('#example').DataTable({
+                        columns: cols,
+                        "scrollY": 800,
+                        "scrollX": true,
+                        dom: 'lBfrtip',
+                        buttons: {
+                            buttons: [
+                                { extend: 'copy', className: 'btn btn-warning' },
+                                { extend: 'excel', className: 'btn btn-info' }
+                            ],
+                            dom: {
+                                button: {
+                                    className: 'btn'
+                                }
+                            }
+                        }
+                    });
+
+                    //add data and draw
+                    table.rows.add(response).draw();
+                    $("#loader").hide();
+
+                });
+        });
+    });
+
+</script>
+
+{% endblock %}

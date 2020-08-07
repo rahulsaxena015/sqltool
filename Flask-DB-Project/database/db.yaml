@@ -1,0 +1,96 @@
+qe:
+  cluster: qe
+  dbhost: or1010050154084
+  dbname: HostedTesting
+or1stage:
+  cluster: na1stage
+  dbhost: sacor1db03
+  dbname: ConnectProCCStage
+emeastage:
+  cluster: emeastage
+  dbhost: sacedb03
+  dbname: ConnectProEMEA_Stage
+apac1:
+  cluster: apac1
+  dbhost: pacapac1db03
+  dbname: ConnectproAPAC01
+ar:
+  cluster: ar
+  dbhost: pacardb03
+  dbname: Connectproarprod
+emea1:
+  cluster: emea1
+  dbhost: pace1db03
+  dbname: ConnectProEMEA
+emea2:
+  clusetr: emea2
+  dbhost: pace2db03
+  dbname: Connectpro
+emea3:
+  clusetr: emea3
+  dbhost: pace3db03
+  dbname: Connectpro
+emea4:
+  clusetr: emea4
+  dbhost: pace4db03
+  dbname: ConnectProEMEA
+emea5:
+  clusetr: emea5
+  dbhost: pace5db03
+  dbname: Connectpro
+emea6:
+  clusetr: emea6
+  dbhost: pace6db03
+  dbname: ConnectProEMEA
+na1:
+  cluster: na1
+  dbhost: pacna1db03
+  dbname: Connectproprod
+na2:
+  cluster: na2
+  dbhost: pacna2db03
+  dbname: connectproprod2
+na3:
+  cluster: na3
+  dbhost: pacna3db03
+  dbname: ConnectproNA3
+na4:
+  cluster: na4
+  dbhost: pacna4db03
+  dbname: ConnectproNA4
+na5:
+  cluster: na5
+  dbhost: pacna5db03
+  dbname: ConnectproNA5
+na6:
+  cluster: na6
+  dbhost: pacna6db03
+  dbname: ConnectproNA6
+na7:
+  cluster: na7
+  dbhost: pacna7db03
+  dbname: ConnectproNA7
+na8:
+  cluster: na8
+  dbhost: pacna8db03
+  dbname: ConnectproNA8
+na9:
+  cluster: na9
+  dbhost: pacna9db03
+  dbname: Connectprona9
+na10:
+  cluster: na10
+  dbhost: pacna10db03
+  dbname: ConnectproNA10
+na11:
+  cluster: na11
+  dbhost: pacna11db03
+  dbname: ConnectproNA11
+na12:
+  cluster: na12
+  dbhost: pacna12db03
+  dbname: Connectpro
+na13:
+  cluster: na13
+  dbhost: pacna13db03
+  dbname: Connectproprod
