@@ -30,6 +30,7 @@ cur = con.cursor()
 def index():
     return render_template('index.html')
 
+
 rows = ""
 
 
