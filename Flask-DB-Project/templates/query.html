@@ -2,51 +2,54 @@
 
 {% block head %}
 <!-- <link href="https://datatables.net/download/build/nightly/jquery.dataTables.css" rel="stylesheet" type="text/css" /> -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+<link rel="stylesheet" href="static/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css"
     href="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.css" />
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" />
+<link rel="stylesheet" type="text/css" href="static/css/dataTables.bootstrap4.min.css" />
 <!-- <link rel="stylesheet" type="text/css" href="/static/css/df_style.css"> -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+<script src="static/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.js"
-    defer></script>
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script> -->
+<script src="static/js/datatables.min.js" defer></script>
+<script src="static/js/ace.js"></script>
+<script src="static/js/ext-language_tools.js"></script>
 
-
+<style>
+    #editor {
+        /* position: relative; */
+        height: 100px;
+        width: 1828px
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <br>
-
-    <!-- <div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color:#cecece"> -->
-    <div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color: rgb(217, 234, 237)">
-        <form action='/query' method='POST' name="myForm">
-            <select class="form-control" id="cluster" name="cluster" searchable="Search here..">
-                <option value="" selected>Select Cluster</option>
-                {% for cluster in cluster_list %}
-                <option value="{{cluster}}">{{cluster.upper()}}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <br>
-            <textarea class="form-control" name="sqlquery" id="sqlquery" placeholder="Enter Your SQL Query Here!!!"
-                aria-label="Enter Your SQL Query Here" rows="3"></textarea>
-            <br>
-            <button class="btn btn-success btn-ladda" data-style="expand-left" type="button"
-                id="btnSubmit">Execute</button>
-            <input type="reset" value="Reset" class="btn btn-primary" onClick="window.location.reload()">
-        </form>
+<!-- <div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color:#cecece"> -->
+<div class="jumbotron text-center hoverable p-4" id="jumbotron" style="background-color: rgb(222, 224, 225)">
+    <form action='/query' method='POST' name="myForm">
+        <select class="form-control" id="cluster" name="cluster" searchable="Search here..">
+            <option value="" selected>Select Cluster</option>
+            {% for cluster in cluster_list %}
+             <option value="{{cluster}}">{{cluster.upper()}}</option>
+            {% endfor %}
+        </select>
         <br>
-        <div id="table2">
-            <table id="example" class="display cell-border" width="100%"></table>
-        </div>
+        <br>
+        <div id="editor" name="editor"></div>
+        <textarea class="form-control" name="sqlquery" id="sqlquery" placeholder="Enter Your SQL Query Here!!!"
+            aria-label="Enter Your SQL Query Here" rows="3" style="display:none;"></textarea>
+        <br>
+        <button class="btn btn-success btn-ladda" data-style="expand-left" type="button" id="btnSubmit">Execute</button>
+        <input type="reset" value="Reset" class="btn btn-primary" onClick="window.location.reload()">
+    </form>
+    <br>
+    <div id="table2">
+        <table id="example" class="display cell-border" width="100%"></table>
     </div>
-    
-
+</div>
 <br>
 
 
@@ -55,6 +58,34 @@
     <img src='static/images/loader.gif' height="50" width="50" /></div>
 
 <script type="text/javascript">
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/sqlserver");
+    editor.getSession().setMode("ace/mode/sql");
+    var textarea = $('textarea[name="sqlquery"]');
+    editor.getSession().on("change", function () {
+        textarea.val(editor.getSession().getValue());
+    });
+    editor.setShowPrintMargin(false);
+    editor.setFontSize("18px");
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
+    });
+
+    function validate() {
+        if (document.myForm.cluster.value == "") {
+            alert("Please select cluster!!!");
+            return false
+        }
+        else if (document.myForm.sqlquery.value == "") {
+            alert("Please type SQL Query!!");
+            document.myForm.sqlquery.focus();
+            return false
+        }
+        return true
+    }
+
     // function myerror() {
     var myerror = '{{ err }}';
     //     if (myerror !== "") {
@@ -65,6 +96,7 @@
     // }
 
     $(document).ready(function () {
+
         $("#btnSubmit").click(function (event) {
             if ($.trim($('#cluster').val()) == '') {
                 alert("Please select Cluster");
@@ -81,7 +113,9 @@
             else {
                 $("#loader").show();
             }
-
+            // if (validate()) {
+            //     $("#loader").show();
+            // }
             if ($.fn.DataTable.isDataTable("#example")) {
                 $('#example').DataTable().clear().destroy();
                 $("#example").empty();
@@ -110,13 +144,14 @@
                         cols.push({
                             title: k,
                             data: k
+                            //optionally do some type detection here for render function
                         });
                     });
 
                     //initialize DataTables
                     var table = $('#example').DataTable({
                         columns: cols,
-                        "scrollY": 800,
+                        "scrollY": 500,
                         "scrollX": true,
                         dom: 'lBfrtip',
                         buttons: {
